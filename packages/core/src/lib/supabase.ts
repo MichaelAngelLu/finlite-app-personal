@@ -4,8 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from '../database.types';
 
 // Get the environment variables
-const supabaseUrl: string = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey: string = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 // Validate the environment variables
 if(!supabaseUrl || !supabaseAnonKey) {
