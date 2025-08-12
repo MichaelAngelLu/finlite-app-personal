@@ -1,0 +1,7 @@
+{
+  "name": "@finlite-app-personal/app",
+  "version": "1.0.0",
+  "dependencies": {
+    "@finlite-app-personal/core": "*"
+  }
+}
