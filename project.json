@@ -1,0 +1,9 @@
+{
+  "name": "finlite-monorepo",
+  "private": true,
+  "scripts": {
+    "start": "cross-env EXPO_USE_PNPM=1 pnpm --filter app start",
+    "app": "pnpm --filter app",
+    "core": "pnpm --filter core"
+  }
+}

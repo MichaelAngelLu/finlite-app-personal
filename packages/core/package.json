@@ -1,5 +1,9 @@
 {
-  "name": "@finlite-app-personal/core",
+  "name": "@finlite/core",
   "version": "1.0.0",
-  "main": "src/index.ts" 
+  "main": "src/index.ts",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.55.0",
+    "react-native-url-polyfill": "^2.0.0"
+  }
 }
