@@ -38,7 +38,7 @@ export default function AddTransactionScreen() {
           amount: parseFloat(amount),
           category_id: category,
           description: description,
-          id: "0000-0001", // Placeholder ID, replace with actual logic if needed
+          id: "0000-0003", // Placeholder ID, replace with actual logic if needed
           receipt_id: null, // Assuming no receipt for now
           transaction_date: date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
           type: transactionType,

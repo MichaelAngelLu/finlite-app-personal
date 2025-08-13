@@ -20,7 +20,6 @@ export default function LoginScreen() {
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      Alert.alert('Success!', 'You are now logged in.');
       router.replace('/dashboard'); // <-- 3. Navigate to the dashboard on success
     }
     setLoading(false);
