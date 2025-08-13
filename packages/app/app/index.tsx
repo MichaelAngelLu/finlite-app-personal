@@ -1,5 +1,4 @@
 // packages/app/app/index.tsx
-import { Text, View } from 'react-native';
 import { Link, useRouter } from 'expo-router'; // <-- Import Link and useRouter
 import React from 'react';
 

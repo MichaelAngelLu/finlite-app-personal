@@ -1,7 +1,7 @@
 // packages/core/src/lib/supabase.ts
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../database.types';
+import type { Database } from '../database.types';
 
 // Get the environment variables
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
