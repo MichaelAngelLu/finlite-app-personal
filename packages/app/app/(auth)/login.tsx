@@ -17,7 +17,12 @@ export default function LoginScreen() {
       password: password,
     });
 
-    if (error) Alert.alert('Error', error.message);
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      Alert.alert('Success!', 'You are now logged in.');
+      router.replace('/dashboard'); // <-- 3. Navigate to the dashboard on success
+    }
     setLoading(false);
   }
 
@@ -89,6 +94,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 30,
     fontWeight: 'bold',
+    marginTop: 40,
     marginBottom: 24,
     textAlign: 'center',
   },
