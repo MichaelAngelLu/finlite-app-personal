@@ -1,23 +1,26 @@
-// packages/app/app/login.tsx
+// packages/app/app/signup.tsx
 import { useState } from 'react';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { supabase } from '@finlite/core';
-import { useRouter } from 'expo-router'; // <-- 1. Import the useRouter hook
+import { Link } from 'expo-router';
 
-export default function LoginScreen() {
-  const router = useRouter(); // <-- 2. Initialize the router
+export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  async function signInWithEmail() {
+  async function signUpWithEmail() {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
       email: email,
       password: password,
     });
 
     if (error) Alert.alert('Error', error.message);
+    if (!session) Alert.alert('Success!', 'Please check your email for a confirmation link.');
     setLoading(false);
   }
 
@@ -25,11 +28,11 @@ export default function LoginScreen() {
     <View>
       <View style={styles.container1}>
         <Text style={styles.header}>FinLite</Text>
-        <Text style={styles.header2}>Welcome</Text>
-        <Text style={styles.subtext}>Simplify your finances with FinLite</Text>
+        <Text style={styles.header2}>Create Account</Text>
+        <Text style={styles.subtext}>Start your financial journey today</Text>
       </View>
       <View style={styles.container2}>
-        <Text style={styles.header2}>Log In</Text>
+        <Text style={styles.header2}>Sign Up</Text>
         <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
@@ -49,25 +52,21 @@ export default function LoginScreen() {
         />
         <View style={{ marginBottom: 16 }}>
           <Button
-            title={loading ? 'Logging In...' : 'Log In'}
-            onPress={signInWithEmail}
+            title={loading ? 'Creating Account...' : 'Sign Up'}
+            onPress={signUpWithEmail}
             disabled={loading}
-            color={'#194F03'} // Your primary color
+            color={'#194F03'}
           />
         </View>
-
-        {/* 3. Replace the <Link> with a secondary <Button> */}
-        <Button
-          title="Create An Account"
-          onPress={() => router.push('/signup')} // Use router.push for navigation
-          color={'#808080'} // A neutral secondary color
-        />
+        <Link href="/login" style={{ textAlign: 'center', color: 'blue' }}>
+          Already have an account? Log In
+        </Link>
       </View>
     </View>
   );
 }
 
-// Styles remain the same
+// Re-using the same styles from your login page for consistency
 const styles = StyleSheet.create({
   container1: {
     flex: 0,
@@ -85,7 +84,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8E8E8',
     margin: 16,
   },
-  // ... other styles
+  outer_container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 16,
+  },
   header: {
     fontSize: 30,
     fontWeight: 'bold',

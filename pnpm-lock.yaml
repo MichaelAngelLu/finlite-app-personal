@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      dotenv:
-        specifier: ^17.2.1
-        version: 17.2.1
     devDependencies:
       cross-env:
         specifier: ^10.0.0
@@ -37,10 +33,10 @@ importers:
         specifier: 0.79.5
         version: 0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0)
       react-native-safe-area-context:
-        specifier: ^5.6.0
+        specifier: ^5.4.0
         version: 5.6.0(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       react-native-screens:
-        specifier: ^4.13.1
+        specifier: ^4.11.1
         version: 4.13.1(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
     devDependencies:
       '@babel/core':
@@ -1334,10 +1330,6 @@ packages:
 
   dotenv@16.4.7:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
-    engines: {node: '>=12'}
-
-  dotenv@17.2.1:
-    resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
     engines: {node: '>=12'}
 
   eastasianwidth@0.2.0:
@@ -4510,8 +4502,6 @@ snapshots:
       dotenv: 16.4.7
 
   dotenv@16.4.7: {}
-
-  dotenv@17.2.1: {}
 
   eastasianwidth@0.2.0: {}
 
