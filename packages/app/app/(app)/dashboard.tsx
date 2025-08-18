@@ -193,5 +193,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingTop: 10,
+    marginBottom: 50, // Adjusted for better spacing
   },
 });

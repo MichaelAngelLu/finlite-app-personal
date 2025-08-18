@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "scheme": "finlite",
+    "android": {
+      "package": "com.finlite.app.personal"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6cb9742d-21ac-4502-b5f4-e2aec0d5e4c8"
+      }
+    }
+  }
+}

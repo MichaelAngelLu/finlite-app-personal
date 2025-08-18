@@ -1,5 +1,18 @@
 {
-	"devDependencies": {
-		"cross-env": "^10.0.0"
-	}
+  "devDependencies": {
+    "cross-env": "^10.0.0",
+    "expo-module-scripts": "^4.1.10"
+  },
+  "name": "finlite-app-personal",
+  "version": "1.0.0",
+  "scripts": {
+    "android": "expo run:android",
+    "ios": "expo run:ios"
+  },
+  "dependencies": {
+    "expo": "~53.0.20",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
+    "expo-dev-client": "~5.2.4"
+  }
 }

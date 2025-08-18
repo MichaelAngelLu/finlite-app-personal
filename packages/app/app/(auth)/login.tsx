@@ -1,14 +1,55 @@
-// packages/app/app/login.tsx
-import { useState } from 'react';
+// packages/app/app/(auth)/login.tsx
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { supabase } from '@finlite/core';
-import { useRouter } from 'expo-router'; // <-- 1. Import the useRouter hook
+import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { makeRedirectUri } from 'expo-auth-session';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
-  const router = useRouter(); // <-- 2. Initialize the router
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // --- Google Auth Logic ---
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId: '158283164371-s3150n27j8l9fnklaphusgh4i7ubpkk7.apps.googleusercontent.com',
+    androidClientId: '158283164371-ofmnchcscscmhb27nc4srs9tt1ub8659.apps.googleusercontent.com',
+    // iosClientId: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com',
+    scopes: ['openid', 'profile', 'email'],
+    redirectUri: makeRedirectUri({
+      scheme: 'finlite', // 👈 must match app.json
+      path: 'auth/callback',
+      preferLocalhost: false,
+    }),
+  });
+  
+
+  useEffect(() => {
+    const signInWithGoogle = async () => {
+      if (response?.type === 'success') {
+        const { id_token } = response.params;
+
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: id_token,
+        });
+
+        if (error) {
+          Alert.alert('Google Sign-In Error', error.message);
+        } else {
+          router.replace('/'); // 👈 redirect after login
+        }
+      }
+    };
+
+    signInWithGoogle();
+  }, [response]);
+  // --- END Google Auth Logic ---
 
   async function signInWithEmail() {
     setLoading(true);
@@ -16,12 +57,8 @@ export default function LoginScreen() {
       email: email,
       password: password,
     });
-
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      router.replace('/dashboard'); // <-- 3. Navigate to the dashboard on success
-    }
+    if (error) Alert.alert('Error', error.message);
+    else router.replace('/');
     setLoading(false);
   }
 
@@ -56,22 +93,29 @@ export default function LoginScreen() {
             title={loading ? 'Logging In...' : 'Log In'}
             onPress={signInWithEmail}
             disabled={loading}
-            color={'#194F03'} // Your primary color
+            color={'#194F03'}
           />
         </View>
 
-        {/* 3. Replace the <Link> with a secondary <Button> */}
+        <View style={{ marginBottom: 16 }}>
+          <Button
+            title="Sign In with Google"
+            onPress={() => promptAsync()}
+            disabled={!request}
+            color="#4285F4"
+          />
+        </View>
+
         <Button
           title="Create An Account"
-          onPress={() => router.push('/signup')} // Use router.push for navigation
-          color={'#808080'} // A neutral secondary color
+          onPress={() => router.push('/signup')}
+          color={'#808080'}
         />
       </View>
     </View>
   );
 }
 
-// Styles remain the same
 const styles = StyleSheet.create({
   container1: {
     flex: 0,
@@ -89,7 +133,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8E8E8',
     margin: 16,
   },
-  // ... other styles
   header: {
     fontSize: 30,
     fontWeight: 'bold',
@@ -111,7 +154,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 10,
   },
   input: {
     height: 40,

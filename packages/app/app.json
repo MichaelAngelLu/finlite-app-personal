@@ -3,6 +3,7 @@
     "name": "FinLite-Personal",
     "slug": "app",
     "version": "1.0.0",
+    "scheme": "finlite",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
@@ -20,6 +21,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.finlite.personal.app",
       "edgeToEdgeEnabled": true
     },
     "web": {
