@@ -38,7 +38,6 @@ export default function AddTransactionScreen() {
           amount: parseFloat(amount),
           category_id: category,
           description: description,
-          id: "0000-0003", // Placeholder ID, replace with actual logic if needed
           receipt_id: null, // Assuming no receipt for now
           transaction_date: date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
           type: transactionType,
@@ -46,7 +45,8 @@ export default function AddTransactionScreen() {
           created_at: new Date().toISOString().split('T')[0], // Use current date for created_at
           update_at: new Date().toISOString().split('T')[0], // Use current date for update_at
         },
-      ]);
+      ])
+      .select();
 
       if (error) {
         Alert.alert('Error', error.message);
