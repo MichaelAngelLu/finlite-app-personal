@@ -1,11 +1,20 @@
 // packages/app/app/(app)/dashboard.tsx
-import { useCallback, useState } from 'react'; // <-- Changed from useCallback
-import { ActivityIndicator, Alert, Button, FlatList, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { supabase } from '@finlite/core';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '../../providers/AuthProvider';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-type NewType = {
+type Transaction = {
   id: string;
   amount: number;
   description: string | null;
@@ -14,7 +23,11 @@ type NewType = {
   type: 'income' | 'expense';
 };
 
-type Transaction = NewType;
+const dateOptions = {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+} as const;
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -22,13 +35,10 @@ export default function DashboardScreen() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
- useFocusEffect(
+  useFocusEffect(
     useCallback(() => {
       const fetchTransactions = async () => {
-        if (!session) {
-          console.log("No session found, skipping fetch.");
-          return;
-        }
+        if (!session) return;
 
         try {
           setLoading(true);
@@ -39,7 +49,6 @@ export default function DashboardScreen() {
             .order('transaction_date', { ascending: false });
 
           if (error) throw error;
-
           setTransactions(data || []);
         } catch (error) {
           if (error instanceof Error) {
@@ -51,55 +60,17 @@ export default function DashboardScreen() {
       };
 
       fetchTransactions();
-    }, [session]) // The function will re-run if the session changes while on the screen
-  ); // Dependency array ensures it runs when the session is available
+    }, [session])
+  );
 
-  const fetchTransactions = async () => {
-    if (!session) {
-      console.log("No session found, skipping fetch.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      console.log("Fetching transactions for user:", session.user.id);
-
-      const { data, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .order('transaction_date', { ascending: false });
-
-      console.log('Supabase data:', data);
-      console.log('Supabase error:', error);
-
-      if (error) throw error;
-
-      console.log("Fetched data:", data);
-
-      setTransactions(data || []);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error fetching transactions:", error.message);
-        Alert.alert('Error', 'Failed to fetch transactions: ' + error.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  // ---------------------------------
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.replace('/');
-  }
-
-  const renderTransaction = ({ item }: { item: Transaction }) => (
+  const renderTransactionItem = ({ item }: { item: Transaction }) => (
     <View style={styles.transactionItem}>
       <View>
         <Text style={styles.transactionCategory}>{item.category_id}</Text>
         <Text style={styles.transactionDate}>{item.description}</Text>
-        <Text style={styles.transactionDate}>{new Date(item.transaction_date).toLocaleDateString()}</Text>
+        <Text style={styles.transactionDate}>
+          {new Date(item.transaction_date).toLocaleDateString('en-US', dateOptions)}
+        </Text>
       </View>
       <Text
         style={[
@@ -112,86 +83,144 @@ export default function DashboardScreen() {
     </View>
   );
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Dashboard</Text>
+  const ListHeader = () => (
+    <>
+      <Text style={styles.header}>Your Financial Overview</Text>
+      <Text style={styles.subHeader}>{new Date().toLocaleDateString('en-US', dateOptions)}</Text>
 
-      <View style={{ marginBottom: 16 }}>
-        <Button
-          title="Add New Transaction"
-          onPress={() => router.push('/add_transaction')}
-          color={'#194F03'}
-        />
+      <View style={styles.balanceCard}>
+        <Text style={styles.balanceLabel}>Total Balance</Text>
+        <Text style={styles.balanceValue}>₱241,429.15</Text>
+        <View style={styles.balanceRow}>
+          <View style={styles.balanceBox}>
+            <Text style={styles.smallLabel}>Income</Text>
+            <Text style={styles.smallValue}>₱183,082.25</Text>
+          </View>
+          <View style={styles.balanceBox}>
+            <Text style={styles.smallLabel}>Expenses</Text>
+            <Text style={styles.smallValue}>₱105,624.37</Text>
+          </View>
+          <View style={styles.balanceBox}>
+            <Text style={styles.smallLabel}>Savings</Text>
+            <Text style={styles.smallValue}>₱77,457.87</Text>
+          </View>
+        </View>
       </View>
 
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Budget Progress</Text>
+        <Text>Groceries: 75%</Text>
+        <Text>Entertainment: 45%</Text>
+        <Text>Transport: 60%</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>AI Insight</Text>
+        <Text style={styles.insightText}>
+          You’re on track! Your spending is 15% lower than last month. Keep it up!
+        </Text>
+        <Text style={styles.streak}>🔥 5 day streak • Budget Master</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Recent Transactions</Text>
+      </View>
+    </>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       {loading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" style={{ flex: 1 }} />
       ) : (
         <FlatList
           data={transactions}
-          renderItem={renderTransaction}
+          renderItem={renderTransactionItem}
           keyExtractor={(item) => item.id.toString()}
-          ListEmptyComponent={<Text style={styles.emptyText}>No transactions yet. Add one!</Text>}
-          style={styles.list}
+          ListHeaderComponent={ListHeader}
+          ListFooterComponent={
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => router.push('/add_transaction')}
+            >
+              <Text style={styles.addButtonText}>+ Add Transaction</Text>
+            </TouchableOpacity>
+          }
+          ListEmptyComponent={
+            <>
+              <ListHeader />
+              <Text style={{ textAlign: 'center', marginTop: 20, paddingBottom: 20 }}>
+                No transactions yet. Add one!
+              </Text>
+            </>
+          }
+          contentContainerStyle={styles.container}
         />
       )}
-
-      <View style={styles.footer}>
-        <Button title="Log Out" onPress={handleLogout} color="#c0392b" />
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
-// Styles remain the same
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    padding: 16,
-    paddingTop: 40,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  list: {
-    flex: 1,
-  },
-  transactionItem: {
     backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  },
+  container: {
+    padding: 16,
+    backgroundColor: '#ffffff',
+  },
+  header: { fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
+  subHeader: { fontSize: 14, textAlign: 'center', color: '#666', marginBottom: 16 },
+  balanceCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  balanceLabel: { fontSize: 14, color: '#555' },
+  balanceValue: { fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
+  balanceRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  balanceBox: { alignItems: 'center', flex: 1 },
+  smallLabel: { fontSize: 12, color: '#777' },
+  smallValue: { fontSize: 14, fontWeight: 'bold' },
+  section: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
-  transactionCategory: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 8 },
+  insightText: { fontSize: 14, color: '#333' },
+  streak: { fontSize: 12, color: '#666', marginTop: 4 },
+  transactionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#fafafa',
   },
-  transactionDate: {
-    fontSize: 12,
-    color: '#666',
+  transactionCategory: { fontSize: 14, fontWeight: 'bold' },
+  transactionDate: { fontSize: 12, color: '#666' },
+  transactionAmount: { fontSize: 16, fontWeight: 'bold' },
+  addButton: {
+    backgroundColor: '#194F03',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 8, // Add margin top to separate from list
   },
-  transactionAmount: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    color: 'gray',
-  },
-  footer: {
-    paddingTop: 10,
-  },
+  addButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });
